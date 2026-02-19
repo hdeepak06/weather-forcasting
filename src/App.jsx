@@ -52,27 +52,35 @@ function App() {
     } catch (err) {
       console.error('API Error, falling back to mock data:', err);
 
-      // Fallback to Mock Data for demonstration
+      const getSeed = (str) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        return Math.abs(hash);
+      };
+      const seed = getSeed(searchCity);
+      const tempBase = 12 + (seed % 20);
+      const humBase = 20 + (seed % 60);
+
       const mockWeather = {
         name: searchCity,
-        sys: { country: 'US', sunrise: Math.floor(Date.now() / 1000) - 10000, sunset: Math.floor(Date.now() / 1000) + 10000 },
-        main: { temp: 22, feels_like: 21, humidity: 45, pressure: 1012 },
-        weather: [{ description: 'partly cloudy', icon: '02d', main: 'Clouds' }],
-        wind: { speed: 4.2 },
+        sys: { country: 'Demo', sunrise: Math.floor(Date.now() / 1000) - 10000, sunset: Math.floor(Date.now() / 1000) + 10000 },
+        main: { temp: tempBase, feels_like: tempBase - 2, humidity: humBase, pressure: 1000 + (seed % 30) },
+        weather: [{ description: tempBase > 22 ? 'sunny' : 'partly cloudy', icon: tempBase > 22 ? '01d' : '02d', main: tempBase > 22 ? 'Clear' : 'Clouds' }],
+        wind: { speed: 1 + (seed % 10) },
         visibility: 10000,
       };
 
       const mockForecast = {
         list: Array(40).fill(null).map((_, i) => ({
           dt: Math.floor(Date.now() / 1000) + i * 10800,
-          main: { temp: 20 + Math.random() * 5 },
-          weather: [{ main: 'Clouds', icon: '03d' }],
-          pop: Math.random()
+          main: { temp: tempBase + (Math.sin(i + seed) * 4) },
+          weather: [{ main: tempBase > 22 ? 'Clear' : 'Clouds', icon: tempBase > 22 ? '01d' : '02d' }],
+          pop: Math.abs(Math.sin(seed + i))
         }))
       };
 
       const mockAir = {
-        main: { aqi: 1 },
+        main: { aqi: (seed % 5) + 1 },
         components: { pm2_5: 5.2, so2: 0.5, no2: 1.2, o3: 35.0 }
       };
 
@@ -81,9 +89,9 @@ function App() {
       setAirQuality(mockAir);
 
       if (err.response?.status === 401) {
-        setError("Note: API Key unauthorized. Showing demo data.");
+        setError(`Note: API Key unauthorized. Showing unique demo data for ${searchCity}.`);
       } else {
-        setError("City data fetch failed. Showing demo data.");
+        setError("Location data not found. Showing demo data.");
       }
       setLoading(false);
     }
