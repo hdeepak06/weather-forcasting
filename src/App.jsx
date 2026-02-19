@@ -61,9 +61,17 @@ function App() {
       const tempBase = 12 + (seed % 20);
       const humBase = 20 + (seed % 60);
 
+      // Map common cities to countries for demo mode realism
+      const cityMapping = {
+        'london': 'GB', 'dubai': 'AE', 'paris': 'FR', 'tokyo': 'JP',
+        'mumbai': 'IN', 'delhi': 'IN', 'sydney': 'AU', 'new york': 'US',
+        'toronto': 'CA', 'berlin': 'DE', 'rome': 'IT', 'madrid': 'ES'
+      };
+      const countryCode = cityMapping[searchCity.toLowerCase()] || 'World';
+
       const mockWeather = {
         name: searchCity,
-        sys: { country: 'Demo', sunrise: Math.floor(Date.now() / 1000) - 10000, sunset: Math.floor(Date.now() / 1000) + 10000 },
+        sys: { country: countryCode, sunrise: Math.floor(Date.now() / 1000) - 10000, sunset: Math.floor(Date.now() / 1000) + 10000 },
         main: { temp: tempBase, feels_like: tempBase - 2, humidity: humBase, pressure: 1000 + (seed % 30) },
         weather: [{ description: tempBase > 22 ? 'sunny' : 'partly cloudy', icon: tempBase > 22 ? '01d' : '02d', main: tempBase > 22 ? 'Clear' : 'Clouds' }],
         wind: { speed: 1 + (seed % 10) },
